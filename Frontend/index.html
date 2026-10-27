@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="State-of-the-art Deep Learning Emotion Recognition in Text using a Bidirectional GRU (BiGRU) Neural Network. 92% benchmark accuracy across 6 human emotions.">
+  <meta name="color-scheme" content="light dark">
+  <title>SentiPulse AI | Deep Learning Emotion Recognition</title>
+
+  <!-- FOUC Prevention Script for Dark Mode Theme (Modern Web Standard) -->
+  <script>
+    (function() {
+      const storedTheme = localStorage.getItem("color-scheme");
+      if (storedTheme) {
+        document.querySelector('meta[name="color-scheme"]').content = storedTheme;
+      }
+    })();
+  </script>
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient Background Mesh Glow -->
+  <div class="ambient-glow glow-1" aria-hidden="true"></div>
+  <div class="ambient-glow glow-2" aria-hidden="true"></div>
+  <div class="ambient-glow glow-3" aria-hidden="true"></div>
+
+  <!-- Header Navigation -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="#hero" class="brand-logo" aria-label="SentiPulse AI Homepage">
+        <div class="logo-icon-wrap">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+            <line x1="9" y1="9" x2="9.01" y2="9"></line>
+            <line x1="15" y1="9" x2="15.01" y2="9"></line>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">SentiPulse</span>
+          <span class="brand-tag">Deep Learning AI</span>
+        </div>
+      </a>
+
+      <nav class="nav-links" aria-label="Main Navigation">
+        <a href="#live-demo" class="nav-item">Playground</a>
+        <a href="#benchmarks" class="nav-item">Model Evaluation</a>
+      </nav>
+
+      <div class="header-actions">
+        <!-- Live API Server Status Pill -->
+        <div class="status-indicator" id="apiStatusPill" title="Checking backend connection status...">
+          <span class="status-dot"></span>
+          <span class="status-label" id="apiStatusText">Checking API...</span>
+        </div>
+
+        <!-- Dark/Light Mode Toggle -->
+        <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle visual theme" title="Toggle color scheme">
+          <svg class="sun-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <a href="#live-demo" class="btn btn-primary btn-sm nav-cta">Try Demo</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- PART 1: HERO & LIVE PLAYGROUND -->
+    <!-- HERO SECTION -->
+    <section id="hero" class="hero-section">
+      <div class="hero-container">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span class="badge-pulse"></span>
+            <span>Natural Language Processing • Deep Learning</span>
+          </div>
+
+          <h1 class="hero-title">
+            Sense the Emotion <br>
+            <span class="gradient-text">Behind Every Word</span>
+          </h1>
+
+          <p class="hero-subtitle">
+            An advanced Bidirectional Recurrent Neural Network (BiGRU) trained on 20,000 real-world contextual text samples to decode intricate human sentiment across 6 distinct emotional spectrums with <strong>91.95% benchmark accuracy</strong>.
+          </p>
+
+          <div class="hero-buttons">
+            <a href="#live-demo" class="btn btn-primary btn-lg">
+              <span>Test Live Predictor</span>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="#benchmarks" class="btn btn-secondary btn-lg">
+              <span>View Model Evaluation</span>
+            </a>
+          </div>
+
+          <!-- Quick Stats Grid -->
+          <div class="hero-stats-grid">
+            <div class="stat-card">
+              <div class="stat-value">91.95%</div>
+              <div class="stat-desc">Test Set Accuracy</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">6 Classes</div>
+              <div class="stat-desc">Emotion Categorization</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">3.45M</div>
+              <div class="stat-desc">Trainable Parameters</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">&lt;15ms</div>
+              <div class="stat-desc">Inference Latency</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVE EMOTION PLAYGROUND -->
+    <section id="live-demo" class="demo-section">
+      <div class="section-container">
+        <div class="section-header text-center">
+          <div class="sub-badge">Live Interactive Inference</div>
+          <h2 class="section-title">Test the Emotion Classifier</h2>
+          <p class="section-subtitle">Type any sentence, feeling, or narrative below. Watch the deep learning network clean, vectorize, and evaluate the emotional probability distribution in real time.</p>
+        </div>
+
+        <div class="demo-workspace">
+          <!-- Input Card -->
+          <div class="demo-input-card">
+            <div class="card-toolbar">
+              <span class="toolbar-title">Input Text</span>
+              <div class="toolbar-actions">
+                <button type="button" class="tool-btn" id="randomSampleBtn" title="Load a random tested prompt">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                  <span>Random Example</span>
+                </button>
+                <button type="button" class="tool-btn" id="clearTextBtn" title="Clear input text">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  <span>Clear</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="textarea-wrapper">
+              <textarea 
+                id="sentenceInput" 
+                class="emotion-textarea" 
+                rows="4" 
+                maxlength="1000" 
+                placeholder="E.g., I just received my dream acceptance letter and I cannot stop smiling with excitement!"></textarea>
+              <div class="textarea-footer">
+                <span class="char-counter"><span id="charCount">0</span> / 1000 characters</span>
+                <span class="shortcut-hint"><kbd>Cmd</kbd> + <kbd>Enter</kbd> to predict</span>
+              </div>
+            </div>
+
+            <!-- Pre-configured Emotion Sample Chips -->
+            <div class="preset-samples-block">
+              <span class="preset-label">Quick Test Scenarios:</span>
+              <div class="preset-chips">
+                <button type="button" class="chip chip-joy" data-text="I can't believe how happy I am right now, this is truly amazing!">
+                  <span class="chip-emoji">😁</span> Joy
+                </button>
+                <button type="button" class="chip chip-sadness" data-text="I feel so completely alone, helpless, and empty inside today.">
+                  <span class="chip-emoji">😢</span> Sadness
+                </button>
+                <button type="button" class="chip chip-love" data-text="I am ever feeling so deeply grateful and in love with the warmth around me.">
+                  <span class="chip-emoji">❤️</span> Love
+                </button>
+                <button type="button" class="chip chip-anger" data-text="I am furious that they abruptly cancelled our project without any notice!">
+                  <span class="chip-emoji">😠</span> Anger
+                </button>
+                <button type="button" class="chip chip-fear" data-text="I feel terrified and anxious when walking alone down those dark quiet streets.">
+                  <span class="chip-emoji">😨</span> Fear
+                </button>
+                <button type="button" class="chip chip-surprise" data-text="I opened the envelope and was completely stunned by the unexpected news!">
+                  <span class="chip-emoji">😮</span> Surprise
+                </button>
+              </div>
+            </div>
+
+            <div class="action-submit-row">
+              <button type="button" id="predictBtn" class="btn btn-primary btn-submit">
+                <span class="btn-text">Classify Emotion</span>
+                <svg class="btn-spinner" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+                  <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Prediction Output Card -->
+          <div class="demo-output-card" id="outputCard">
+            <!-- Empty State -->
+            <div class="output-placeholder" id="outputPlaceholder">
+              <div class="placeholder-icon">
+                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                </svg>
+              </div>
+              <h3>Awaiting Input</h3>
+              <p>Type a sentence or click one of the quick test presets above to trigger the neural network prediction.</p>
+            </div>
+
+            <!-- Active Result View (Hidden initially) -->
+            <div class="output-result" id="outputResult" style="display: none;">
+              <!-- Dominant Emotion Banner -->
+              <div class="dominant-emotion-card" id="dominantCard">
+                <div class="dominant-left">
+                  <div class="dominant-emoji-circle" id="dominantEmoji">😁</div>
+                  <div class="dominant-info">
+                    <span class="dominant-badge">Predicted Emotion</span>
+                    <h3 class="dominant-title" id="dominantName">Joy</h3>
+                    <p class="dominant-interpretation" id="dominantComment">High positive emotional resonance detected.</p>
+                  </div>
+                </div>
+                <div class="dominant-right">
+                  <div class="confidence-circle">
+                    <span class="confidence-number" id="dominantConfidence">98.5%</span>
+                    <span class="confidence-caption">Confidence</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Probability Distribution Meter Bars -->
+              <div class="probability-distribution">
+                <div class="dist-header">
+                  <span class="dist-title">All 6 Emotion Probabilities</span>
+                  <span class="dist-meta">Softmax Output Vector</span>
+                </div>
+
+                <div class="bars-container" id="probabilityBars">
+                  <!-- Bars populated dynamically by JS -->
+                </div>
+              </div>
+
+              <!-- NLP Preprocessing Pipeline Inspector -->
+              <div class="pipeline-inspector">
+                <button type="button" class="pipeline-toggle-btn" id="pipelineToggleBtn">
+                  <span>NLP Preprocessing Trace</span>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="pipeline-details" id="pipelineDetails" style="display: none;">
+                  <div class="pipe-step">
+                    <span class="pipe-lbl">1. Cleaned &amp; Normalized:</span>
+                    <code id="pipeCleanedText">-</code>
+                  </div>
+                  <div class="pipe-step">
+                    <span class="pipe-lbl">2. Token Sequence (Vocab 10,000):</span>
+                    <code id="pipeTokens">-</code>
+                  </div>
+                  <div class="pipe-step">
+                    <span class="pipe-lbl">3. Tensor Dimension:</span>
+                    <code>1 &times; 50 (Post-padded with 0s) &rarr; BiGRU Model</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Prediction History Shelf -->
+        <div class="history-shelf" id="historyShelf" style="display: none;">
+          <div class="shelf-header">
+            <span class="shelf-title">Recent Predictions Session</span>
+            <button type="button" class="clear-history-btn" id="clearHistoryBtn">Clear</button>
+          </div>
+          <div class="history-chips-row" id="historyList">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 2: MODEL EVALUATION & COMPARISON -->
+    <!-- BENCHMARK & EVALUATION RESULTS -->
+    <section id="benchmarks" class="bench-section">
+      <div class="section-container">
+        <div class="section-header text-center">
+          <div class="sub-badge">Empirical Results</div>
+          <h2 class="section-title">Model Evaluation &amp; Comparison</h2>
+          <p class="section-subtitle">Comparing Simple RNN, Standard LSTM, Standard GRU, and our champion Bidirectional GRU model tested on 2,000 unseen benchmark samples.</p>
+        </div>
+
+        <!-- Comparative Model Cards -->
+        <div class="model-comparison-grid">
+          <div class="comp-card">
+            <div class="comp-badge">Baseline Model</div>
+            <h3>Simple RNN</h3>
+            <div class="comp-acc">~78.4%</div>
+            <span class="comp-loss">Test Loss: ~0.642</span>
+            <ul class="comp-traits">
+              <li>128 &rarr; 64 SimpleRNN Units</li>
+              <li>Prone to vanishing gradients</li>
+              <li>Fails on long-range dependencies</li>
+            </ul>
+          </div>
+
+          <div class="comp-card">
+            <div class="comp-badge">Sequential Memory</div>
+            <h3>Standard LSTM</h3>
+            <div class="comp-acc">~88.9%</div>
+            <span class="comp-loss">Test Loss: ~0.315</span>
+            <ul class="comp-traits">
+              <li>128 &rarr; 64 Unidirectional LSTM</li>
+              <li>Input, forget, and output gates</li>
+              <li>Higher memory and compute overhead</li>
+            </ul>
+          </div>
+
+          <div class="comp-card">
+            <div class="comp-badge">Gated Efficiency</div>
+            <h3>Standard GRU</h3>
+            <div class="comp-acc">~89.7%</div>
+            <span class="comp-loss">Test Loss: ~0.288</span>
+            <ul class="comp-traits">
+              <li>128 &rarr; 64 Unidirectional GRU</li>
+              <li>Streamlined two-gate structure</li>
+              <li>Faster convergence than LSTM</li>
+            </ul>
+          </div>
+
+          <div class="comp-card winner-card">
+            <div class="comp-badge winner-badge">&#9733; Champion Model</div>
+            <h3>Bidirectional GRU</h3>
+            <div class="comp-acc winner-acc">91.95%</div>
+            <span class="comp-loss winner-loss">Test Loss: 0.1960</span>
+            <ul class="comp-traits">
+              <li>Bidirectional 128 &rarr; 64 GRU + 300D Emb</li>
+              <li>Captures dual-directional context</li>
+              <li>Highest F1-score across all 6 classes</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Confusion Matrix & Classification Metrics -->
+        <div class="eval-grid-two">
+          <!-- Interactive Confusion Matrix -->
+          <div class="eval-panel">
+            <div class="panel-header">
+              <div>
+                <h3>Interactive Test Confusion Matrix</h3>
+                <p class="panel-desc">2,000 Ground Truth Test Samples vs BiGRU Predictions</p>
+              </div>
+              <span class="chip-sm">N = 2,000</span>
+            </div>
+
+            <div class="matrix-wrapper">
+              <div class="matrix-labels-top">
+                <span class="matrix-axis-title">Predicted Emotion</span>
+              </div>
+              <div class="matrix-container">
+                <div class="matrix-y-axis">
+                  <span>Actual Emotion</span>
+                </div>
+                <div class="matrix-table-wrap">
+                  <table class="confusion-table" id="confusionTable">
+                    <thead>
+                      <tr>
+                        <th>Actual \ Pred</th>
+                        <th>Sadness</th>
+                        <th>Joy</th>
+                        <th>Love</th>
+                        <th>Anger</th>
+                        <th>Fear</th>
+                        <th>Surprise</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Populated by JS with exact values and heat colors -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="matrix-tooltip" id="matrixTooltip">Hover or click a cell to inspect precision and sample counts</div>
+            </div>
+          </div>
+
+          <!-- Per-Class Classification Report -->
+          <div class="eval-panel">
+            <div class="panel-header">
+              <div>
+                <h3>Per-Emotion Classification Report</h3>
+                <p class="panel-desc">Evaluated with balanced weighting on 2,000 holdout tests</p>
+              </div>
+              <span class="chip-sm">Macro F1: 0.88</span>
+            </div>
+
+            <div class="report-table-wrap">
+              <table class="report-table">
+                <thead>
+                  <tr>
+                    <th>Class</th>
+                    <th>Precision</th>
+                    <th>Recall</th>
+                    <th>F1-Score</th>
+                    <th>Support</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="class-pill class-sadness">😢 Sadness</span></td>
+                    <td><strong>97%</strong></td>
+                    <td>96%</td>
+                    <td><div class="f1-meter"><span style="width: 97%;"></span> 0.97</div></td>
+                    <td>581</td>
+                  </tr>
+                  <tr>
+                    <td><span class="class-pill class-joy">😁 Joy</span></td>
+                    <td><strong>99%</strong></td>
+                    <td>90%</td>
+                    <td><div class="f1-meter"><span style="width: 94%;"></span> 0.94</div></td>
+                    <td>695</td>
+                  </tr>
+                  <tr>
+                    <td><span class="class-pill class-love">❤️ Love</span></td>
+                    <td>73%</td>
+                    <td><strong>99%</strong></td>
+                    <td><div class="f1-meter"><span style="width: 84%;"></span> 0.84</div></td>
+                    <td>159</td>
+                  </tr>
+                  <tr>
+                    <td><span class="class-pill class-anger">😠 Anger</span></td>
+                    <td><strong>96%</strong></td>
+                    <td>89%</td>
+                    <td><div class="f1-meter"><span style="width: 92%;"></span> 0.92</div></td>
+                    <td>275</td>
+                  </tr>
+                  <tr>
+                    <td><span class="class-pill class-fear">😨 Fear</span></td>
+                    <td>84%</td>
+                    <td>86%</td>
+                    <td><div class="f1-meter"><span style="width: 85%;"></span> 0.85</div></td>
+                    <td>224</td>
+                  </tr>
+                  <tr>
+                    <td><span class="class-pill class-surprise">😮 Surprise</span></td>
+                    <td>63%</td>
+                    <td>89%</td>
+                    <td><div class="f1-meter"><span style="width: 74%;"></span> 0.74</div></td>
+                    <td>66</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr class="tfoot-highlight">
+                    <td>Weighted Avg</td>
+                    <td>93%</td>
+                    <td>92%</td>
+                    <td>0.92</td>
+                    <td>2,000</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <!-- Training Curve SVG -->
+            <div class="training-curve-card">
+              <div class="curve-header">
+                <span class="curve-title">Training &amp; Validation Loss Curves</span>
+                <span class="curve-badge">Early Stopping: Epoch 6</span>
+              </div>
+              <svg class="curve-svg" viewBox="0 0 500 120" preserveAspectRatio="none">
+                <!-- Grid Lines -->
+                <line x1="40" y1="20" x2="480" y2="20" stroke="var(--border-color)" stroke-dasharray="2,2" />
+                <line x1="40" y1="60" x2="480" y2="60" stroke="var(--border-color)" stroke-dasharray="2,2" />
+                <line x1="40" y1="100" x2="480" y2="100" stroke="var(--border-color)" />
+                <!-- Epoch markers -->
+                <text x="40" y="115" fill="var(--text-muted)" font-size="10">Ep 1</text>
+                <text x="128" y="115" fill="var(--text-muted)" font-size="10">Ep 2</text>
+                <text x="216" y="115" fill="var(--text-muted)" font-size="10">Ep 3 (Best)</text>
+                <text x="304" y="115" fill="var(--text-muted)" font-size="10">Ep 4</text>
+                <text x="392" y="115" fill="var(--text-muted)" font-size="10">Ep 5</text>
+                <text x="470" y="115" fill="var(--text-muted)" font-size="10">Ep 6</text>
+                <!-- Train Loss (Cyan) -->
+                <path d="M 40 98 Q 128 35, 216 22 T 304 18 T 392 15 T 470 12" fill="none" stroke="#06b6d4" stroke-width="2.5" />
+                <!-- Val Loss (Purple) -->
+                <path d="M 40 45 Q 128 30, 216 24 T 304 30 T 392 34 T 470 32" fill="none" stroke="#8b5cf6" stroke-width="2.5" stroke-dasharray="4,2" />
+              </svg>
+              <div class="curve-legend">
+                <span class="legend-item"><span class="legend-line line-train"></span> Train Loss (0.99 &rarr; 0.07)</span>
+                <span class="legend-item"><span class="legend-line line-val"></span> Val Loss (0.37 &rarr; 0.196)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="brand-logo">
+            <div class="logo-icon-wrap">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+            </div>
+            <span class="brand-title">SentiPulse AI</span>
+          </div>
+          <p class="footer-mission">End-to-end Deep Learning sentiment intelligence powered by Bidirectional Recurrent Neural Networks and FastAPI.</p>
+        </div>
+
+        <div class="footer-links-group">
+          <div class="footer-col">
+            <span class="footer-heading">Navigation</span>
+            <a href="#hero">Overview</a>
+            <a href="#live-demo">Live Classifier</a>
+            <a href="#benchmarks">Model Evaluation</a>
+          </div>
+          <div class="footer-col">
+            <span class="footer-heading">Evaluation</span>
+            <a href="#benchmarks">Model Comparison</a>
+            <a href="#benchmarks">Confusion Matrix</a>
+            <a href="#benchmarks">Classification Report</a>
+          </div>
+          <div class="footer-col">
+            <span class="footer-heading">Neural Specs</span>
+            <span>BiGRU (3.45M Params)</span>
+            <span>FastAPI Server</span>
+            <span>Keras 3.x Deep Learning</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 SentiPulse AI Project. Deep Learning Emotion Recognition.</p>
+        <div class="footer-badges">
+          <span class="stack-badge">BiGRU 300D</span>
+          <span class="stack-badge">FastAPI</span>
+          <span class="stack-badge">91.95% Accuracy</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Main JavaScript File -->
+  <script src="script.js"></script>
+</body>
+</html>
