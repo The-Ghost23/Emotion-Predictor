@@ -178,22 +178,33 @@ function setupEventListeners() {
     historyList.innerHTML = "";
     showToast("Prediction history cleared");
   });
+
+  // Re-check backend health on clicking the status pill
+  apiStatusPill.style.cursor = "pointer";
+  apiStatusPill.addEventListener("click", () => {
+    showToast("Pinging backend API...");
+    checkBackendHealth();
+  });
 }
 
 // --- 5. Backend Health Check ---
+let healthRetryTimer = null;
+
 async function checkBackendHealth() {
   const isRemote = !isLocalhost && API_BASE_URL;
-  if (isRemote) {
+  if (isRemote && !isBackendLive) {
     apiStatusText.textContent = "Connecting to API...";
   }
 
   // Set a cold-start timeout indicator for Render free tier sleep
   const wakeupTimer = setTimeout(() => {
-    apiStatusText.textContent = "Waking up server (~30s)...";
-    const dot = apiStatusPill.querySelector(".status-dot");
-    dot.className = "status-dot offline";
-    apiStatusPill.title = "Render free tier sleeps after inactivity. Spinning up server container...";
-  }, 3000);
+    if (!isBackendLive) {
+      apiStatusText.textContent = "Waking up server (~30s)...";
+      const dot = apiStatusPill.querySelector(".status-dot");
+      dot.className = "status-dot offline";
+      apiStatusPill.title = "Render free tier sleeps after inactivity. Spinning up server container...";
+    }
+  }, 2500);
 
   try {
     const startTime = performance.now();
@@ -211,17 +222,27 @@ async function checkBackendHealth() {
       apiStatusText.textContent = `${sourceName} (${latency}ms)`;
       apiStatusPill.title = `Active Backend: ${isLocalhost ? 'http://127.0.0.1:8000 (Local)' : API_BASE_URL + ' (Render)'}. BiGRU Model loaded into memory. Latency: ${latency}ms`;
       console.log(`[SentiPulse AI] Connected to backend: ${isLocalhost ? 'Localhost (127.0.0.1:8000)' : API_BASE_URL} (${latency}ms)`);
+      if (healthRetryTimer) clearTimeout(healthRetryTimer);
       return;
+    } else {
+      console.warn(`[SentiPulse AI] Backend returned HTTP ${resp.status}`);
     }
   } catch (err) {
     clearTimeout(wakeupTimer);
+    console.warn("[SentiPulse AI] Backend health check failed:", err);
   }
 
   isBackendLive = false;
   const dot = apiStatusPill.querySelector(".status-dot");
   dot.className = "status-dot offline";
   apiStatusText.textContent = "Standalone Mode";
-  apiStatusPill.title = "Backend server not reachable. Running standalone neural simulation engine.";
+  apiStatusPill.title = "Backend server not reachable. Click to retry connection.";
+
+  // Auto-retry in 10s if on remote URL (e.g. while Render is spinning up from sleep)
+  if (isRemote) {
+    if (healthRetryTimer) clearTimeout(healthRetryTimer);
+    healthRetryTimer = setTimeout(checkBackendHealth, 10000);
+  }
 }
 
 // --- 6. Prediction Engine (Normal backend with graceful fallback) ---
