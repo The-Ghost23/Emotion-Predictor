@@ -79,7 +79,7 @@ const CONFUSION_MATRIX = [
 
 // --- 2. Backend URL Configuration & State ---
 // When deployed on Vercel, replace with your live Render Web Service URL:
-const RENDER_BACKEND_URL = "https://emotion-predictor.onrender.com";
+const RENDER_BACKEND_URL = "https://emotion-predictor-9mn2.onrender.com";
 
 // Auto-detect base API URL:
 // - If running on localhost or 127.0.0.1, use relative paths to communicate with local FastAPI server
