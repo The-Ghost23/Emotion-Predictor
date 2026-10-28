@@ -1,0 +1,10 @@
+# Ignore backend files & large models so Vercel does not build Python Serverless Functions
+main.py
+requirements.txt
+requirements-dev.txt
+render.yaml
+Models/
+Emotion.ipynb
+.venv/
+__pycache__/
+
