@@ -1,3 +1,6 @@
+import os
+os.environ.setdefault("KERAS_HOME", "/tmp/keras")
+
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import Tokenizer
 from fastapi import FastAPI,HTTPException
@@ -10,6 +13,8 @@ from keras.models import load_model
 import numpy as np
 import pickle
 import re
+import os
+import uvicorn
 
 model_path = "Models/BiGRU_model.keras"
 tokenizer_path = "Models/tokenizer.pkl"
@@ -127,8 +132,12 @@ def predict_emotion(text_input: textinput):
         predicted_emotion = emotion_labels[top_emotion_index],
         confidence = float(probabilities[top_emotion_index]),
         all_probabilities = all_probabilities,
-        
     )
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
+
 
     
     

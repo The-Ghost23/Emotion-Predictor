@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "routes": [
+    {
+      "src": "/assets/(.*)",
+      "dest": "/Frontend/assets/$1"
+    },
+    {
+      "src": "/style.css",
+      "dest": "/Frontend/style.css"
+    },
+    {
+      "src": "/script.js",
+      "dest": "/Frontend/script.js"
+    },
+    {
+      "src": "/",
+      "dest": "/Frontend/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/Frontend/$1"
+    }
+  ]
+}
+

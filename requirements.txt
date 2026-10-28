@@ -1,0 +1,16 @@
+# ==============================================================================
+# SentiPulse AI - Production Requirements (Render Web Service)
+# ==============================================================================
+
+# Web Framework & Server Runtime
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.7.0
+
+# Deep Learning Runtime (Lightweight CPU build for Render containers)
+tensorflow-cpu>=2.16.0
+keras>=3.0.0
+numpy>=1.26.0
+
+# Machine Learning & Utilities
+scikit-learn>=1.4.0

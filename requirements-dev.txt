@@ -1,0 +1,13 @@
+# ==============================================================================
+# Development & Notebook Retraining Requirements (Local / Colab)
+# ==============================================================================
+
+-r requirements.txt
+
+# Dataset & Data Science (for Emotion.ipynb)
+datasets>=2.14.0
+pandas>=2.0.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+ipykernel>=6.0.0
+

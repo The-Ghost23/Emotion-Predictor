@@ -77,7 +77,19 @@ const CONFUSION_MATRIX = [
   [  0,  4,  1,  1,  1,  59]  // Actual: surprise (66)
 ];
 
-// --- 2. State & DOM Elements ---
+// --- 2. Backend URL Configuration & State ---
+// When deployed on Vercel, replace with your live Render Web Service URL:
+const RENDER_BACKEND_URL = "https://emotion-predictor.onrender.com";
+
+// Auto-detect base API URL:
+// - If running on localhost or 127.0.0.1, use relative paths to communicate with local FastAPI server
+// - If running on Vercel or custom domain, route calls to RENDER_BACKEND_URL
+const isLocalhost = window.location.hostname === "localhost" || 
+                    window.location.hostname === "127.0.0.1" || 
+                    window.location.protocol === "file:";
+
+const API_BASE_URL = isLocalhost ? "" : RENDER_BACKEND_URL.replace(/\/$/, "");
+
 let isBackendLive = false;
 let historyPredictions = [];
 
@@ -170,9 +182,24 @@ function setupEventListeners() {
 
 // --- 5. Backend Health Check ---
 async function checkBackendHealth() {
+  const isRemote = !isLocalhost && API_BASE_URL;
+  if (isRemote) {
+    apiStatusText.textContent = "Connecting to API...";
+  }
+
+  // Set a cold-start timeout indicator for Render free tier sleep
+  const wakeupTimer = setTimeout(() => {
+    apiStatusText.textContent = "Waking up server (~30s)...";
+    const dot = apiStatusPill.querySelector(".status-dot");
+    dot.className = "status-dot offline";
+    apiStatusPill.title = "Render free tier sleeps after inactivity. Spinning up server container...";
+  }, 3000);
+
   try {
     const startTime = performance.now();
-    const resp = await fetch("/health", { method: "GET" });
+    const resp = await fetch(`${API_BASE_URL}/health`, { method: "GET" });
+    clearTimeout(wakeupTimer);
+
     if (resp.ok) {
       const data = await resp.json();
       const latency = Math.round(performance.now() - startTime);
@@ -185,14 +212,14 @@ async function checkBackendHealth() {
       return;
     }
   } catch (err) {
-    // Running in standalone static mode or backend paused
+    clearTimeout(wakeupTimer);
   }
 
   isBackendLive = false;
   const dot = apiStatusPill.querySelector(".status-dot");
   dot.className = "status-dot offline";
   apiStatusText.textContent = "Standalone Mode";
-  apiStatusPill.title = "Local FastAPI server not reachable. Running standalone neural simulation engine.";
+  apiStatusPill.title = "Backend server not reachable. Running standalone neural simulation engine.";
 }
 
 // --- 6. Prediction Engine (Normal backend with graceful fallback) ---
@@ -228,23 +255,35 @@ async function executePrediction() {
 
 // Predict via real FastAPI Backend
 async function predictViaAPI(text) {
-  const resp = await fetch("/predict", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text: text })
-  });
+  // If request takes longer than 2.5s on Render free tier, show cold-start notice
+  const coldStartTimer = setTimeout(() => {
+    showToast("Server is spinning up, please wait a moment...");
+  }, 2500);
 
-  if (!resp.ok) {
-    throw new Error(`Server returned HTTP ${resp.status}`);
+  try {
+    const resp = await fetch(`${API_BASE_URL}/predict`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: text })
+    });
+
+    clearTimeout(coldStartTimer);
+
+    if (!resp.ok) {
+      throw new Error(`Server returned HTTP ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    return {
+      text: text,
+      predicted_emotion: data.predicted_emotion,
+      confidence: data.confidence,
+      all_probabilities: data.all_probabilities
+    };
+  } catch (err) {
+    clearTimeout(coldStartTimer);
+    throw err;
   }
-
-  const data = await resp.json();
-  return {
-    text: text,
-    predicted_emotion: data.predicted_emotion,
-    confidence: data.confidence,
-    all_probabilities: data.all_probabilities
-  };
 }
 
 // NLP Preprocessor for inspection and fallback
