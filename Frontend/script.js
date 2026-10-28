@@ -207,8 +207,10 @@ async function checkBackendHealth() {
 
       const dot = apiStatusPill.querySelector(".status-dot");
       dot.className = "status-dot online";
-      apiStatusText.textContent = `FastAPI Online (${latency}ms)`;
-      apiStatusPill.title = `Backend active. BiGRU Model loaded into memory. Latency: ${latency}ms`;
+      const sourceName = isLocalhost ? "Localhost" : "Render API";
+      apiStatusText.textContent = `${sourceName} (${latency}ms)`;
+      apiStatusPill.title = `Active Backend: ${isLocalhost ? 'http://127.0.0.1:8000 (Local)' : API_BASE_URL + ' (Render)'}. BiGRU Model loaded into memory. Latency: ${latency}ms`;
+      console.log(`[SentiPulse AI] Connected to backend: ${isLocalhost ? 'Localhost (127.0.0.1:8000)' : API_BASE_URL} (${latency}ms)`);
       return;
     }
   } catch (err) {
@@ -261,6 +263,7 @@ async function predictViaAPI(text) {
   }, 2500);
 
   try {
+    console.log(`[SentiPulse AI] Sending inference request to: ${API_BASE_URL || window.location.origin}/predict`);
     const resp = await fetch(`${API_BASE_URL}/predict`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
